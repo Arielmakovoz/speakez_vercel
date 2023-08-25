@@ -1,37 +1,36 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function Home() {
-  const [message, setMessage] = useState<string>(''); // Define type as string
-  const [inputMessage, setInputMessage] = useState<string>(''); // Define type as string
+    const [word, setWord] = useState('');
+    const [echoedWord, setEchoedWord] = useState('');
 
-  const fetchMessage = async () => {
-    try {
-      const response = await fetch('/api/send-message', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: inputMessage }),
-      });
-      const data = await response.json();
-      setMessage(data.message);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+    const handleInputChange = (event) => {
+        setWord(event.target.value);
+    };
 
-  return (
-    <div className="container">
-      <h1>Flask and Next.js Application</h1>
-      <div>
-        <input
-          type="text"
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-        />
-        <button onClick={fetchMessage}>Send Message</button>
-      </div>
-      <p>Server Response: {message}</p>
-    </div>
-  );
+    const handleSubmit = async () => {
+        try {
+            const response = await fetch('/api/echo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ word }),  // Use the correct variable name 'word'
+            });
+
+            const data = await response.json();
+            setEchoedWord(data.echoed_word);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    return (
+        <div>
+            <h1>Word Echo</h1>
+            <input type="text" value={word} onChange={handleInputChange} />
+            <button onClick={handleSubmit}>Echo</button>
+            {echoedWord && <p>Echoed Word: {echoedWord}</p>}
+        </div>
+    );
 }
