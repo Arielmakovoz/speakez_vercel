@@ -1,11 +1,9 @@
 from flask import Flask, request, jsonify
-#from backend import speech_fluency
-#hiiiiiii
+
 app = Flask(__name__)
 
-@app.route('/api/send-message', methods=['POST'])
-def send_message():
+@app.route('/echo', methods=['POST'])
+def echo():
     data = request.json
-    #speech_fluency('stutter_audio.wav')
-    received_message = data.get('message', '')
-    return jsonify(message=f'Server receivedddd: {received_message}')
+    word = data.get('word')
+    return jsonify({'echoed_word': word})
