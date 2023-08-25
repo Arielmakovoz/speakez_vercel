@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from backend import delete_this
+#from backend import delete_this
 #hiiiiiii
 app = Flask(__name__)
 
@@ -7,4 +7,4 @@ app = Flask(__name__)
 def echo():
     data = request.json
     word = data.get('word')
-    return jsonify({'echoed_word': delete_this()})
+    return jsonify({'echoed_word': word})
