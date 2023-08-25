@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 #hiiiiiii
 app = Flask(__name__)
 
-@app.route('/api/send-message', methods=['POST'])
+@app.route('/api/echo', methods=['POST'])
 def send_message():
     data = request.json
     #speech_fluency('stutter_audio.wav')
