@@ -1,9 +1,6 @@
-from flask import Flask, request, jsonify
-
+from flask import Flask
 app = Flask(__name__)
 
-@app.route('/echo', methods=['POST'])
-def echo():
-    data = request.json
-    word = data.get('word')
-    return jsonify({'echoed_word': word})
+@app.route("/api/python")
+def hello_world():
+    return "<p>Hello, World!</p>"
