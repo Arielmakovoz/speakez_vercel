@@ -7,6 +7,8 @@ import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 
+def delete_this():
+    return 'hi'
 
 def speech_fluency(audiofile_path):
     # Step 1: Load the trained model
