@@ -27,7 +27,7 @@ export default function Home() {
 
     return (
         <div>
-            <h1>Wwword Echo</h1>
+            <h1>Word Echo</h1>
             <input type="text" value={word} onChange={handleInputChange} />
             <button onClick={handleSubmit}>Echo</button>
             {echoedWord && <p>Echoed Word: {echoedWord}</p>}
