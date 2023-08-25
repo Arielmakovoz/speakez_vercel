@@ -30,7 +30,7 @@ export default function Home() {
             <h1>Word Echo</h1>
             <input type="text" value={word} onChange={handleInputChange} />
             <button onClick={handleSubmit}>Echo</button>
-            {echoedWord && <p>Echoed Word: {echoedWord}</p>}
+            {echoedWord && <p>Echoed Wwwword: {echoedWord}</p>}
         </div>
     );
 }
