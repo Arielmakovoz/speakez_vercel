@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import wave
@@ -35,9 +34,6 @@ def get_audio_duration(audio_path):
     duration = float(audio.getnframes()) / audio.getframerate()
     audio.close()
     return duration
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 #when I took out the backend.py from api and stutter model if worked
 #Lucas wil get the Replicator to work and I will add
