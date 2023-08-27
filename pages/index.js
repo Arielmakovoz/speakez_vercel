@@ -1,36 +1,42 @@
 import { useState } from 'react';
+import axios from 'axios';
 
 export default function Home() {
-    const [word, setWord] = useState('');
-    const [echoedWord, setEchoedWord] = useState('');
+  const [recording, setRecording] = useState(false);
+  const [duration, setDuration] = useState(null);
 
-    const handleInputChange = (event) => {
-        setWord(event.target.value);
-    };
+  const startRecording = () => {
+    setRecording(true);
+    // Start recording logic (use browser APIs like MediaRecorder)
+  };
 
-    const handleSubmit = async () => {
-        try {
-            const response = await fetch('/api/echo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ word }),  // Use the correct variable name 'word'
-            });
+  const stopRecording = async () => {
+    setRecording(false);
+    // Stop recording logic and obtain the audio Blob
 
-            const data = await response.json();
-            setEchoedWord(data.echoed_word);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
+    const formData = new FormData();
+    formData.append('audio', audioBlob);
 
-    return (
-        <div>
-            <h1>Word Echo</h1>
-            <input type="text" value={word} onChange={handleInputChange} />
-            <button onClick={handleSubmit}>Echo</button>
-            {echoedWord && <p>Echoed Word: {echoedWord}</p>}
-        </div>
-    );
+    try {
+      const response = await axios.post('/api/process_audio', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      setDuration(response.data.duration);
+    } catch (error) {
+      console.error('Error processing audio:', error);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={startRecording} disabled={recording}>
+        Start Recording
+      </button>
+      <button onClick={stopRecording} disabled={!recording}>
+        Stop Recording
+      </button>
+      {duration && <p>Audio Duration: {duration.toFixed(2)} seconds</p>}
+    </div>
+  );
 }
