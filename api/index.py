@@ -14,6 +14,8 @@ def process_audio():
     if audio_file.filename == '':
         return jsonify({'error': 'No selected audio file'}), 400
 
+    app.logger.info('Received audio file: %s', audio_file.filename)
+
     audio_duration = get_audio_duration(audio_file)
     
     return jsonify({'duration': audio_duration})
