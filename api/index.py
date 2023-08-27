@@ -1,10 +1,8 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+
 import wave
 
 app = Flask(__name__)
-CORS(app)
-
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
 @app.route('/api/process_audio', methods=['POST'])
