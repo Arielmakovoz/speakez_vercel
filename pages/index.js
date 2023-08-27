@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import axios from 'axios';
 
 export default function Home() {
   const [recording, setRecording] = useState(false);
   const [duration, setDuration] = useState(null);
+  const [audioBlob, setAudioBlob] = useState(null); // Replace with the actual recorded audio Blob
 
   const startRecording = () => {
     setRecording(true);
@@ -18,11 +18,13 @@ export default function Home() {
     formData.append('audio', audioBlob);
 
     try {
-      const response = await axios.post('/api/process_audio', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const response = await fetch('/api/process_audio', {
+        method: 'POST',
+        body: formData,
       });
 
-      setDuration(response.data.duration);
+      const data = await response.json();
+      setDuration(data.duration);
     } catch (error) {
       console.error('Error processing audio:', error);
     }
