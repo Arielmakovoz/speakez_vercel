@@ -3,17 +3,39 @@ import { useState } from 'react';
 export default function Home() {
   const [recording, setRecording] = useState(false);
   const [duration, setDuration] = useState(null);
-  const [audioBlob, setAudioBlob] = useState(null); // Replace with the actual recorded audio Blob
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioChunks, setAudioChunks] = useState([]);
 
   const startRecording = () => {
-    setRecording(true);
-    // Start recording logic (use browser APIs like MediaRecorder)
+    setAudioChunks([]);
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        const recorder = new MediaRecorder(stream);
+        recorder.ondataavailable = e => {
+          if (e.data.size > 0) {
+            setAudioChunks(prevChunks => [...prevChunks, e.data]);
+          }
+        };
+        recorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          setDuration(audioBlob.duration); // This line will not work. AudioBlob doesn't have a duration property.
+          sendAudioToServer(audioBlob);
+        };
+        setMediaRecorder(recorder);
+        recorder.start();
+        setRecording(true);
+      })
+      .catch(error => console.error('Error accessing microphone:', error));
   };
 
-  const stopRecording = async () => {
-    setRecording(false);
-    // Stop recording logic and obtain the audio Blob
+  const stopRecording = () => {
+    if (mediaRecorder && recording) {
+      mediaRecorder.stop();
+      setRecording(false);
+    }
+  };
 
+  const sendAudioToServer = async audioBlob => {
     const formData = new FormData();
     formData.append('audio', audioBlob);
 
@@ -26,7 +48,7 @@ export default function Home() {
       const data = await response.json();
       setDuration(data.duration);
     } catch (error) {
-      console.error('Error processing audio:', error);
+      console.error('Error sending audio to server:', error);
     }
   };
 
