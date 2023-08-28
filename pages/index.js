@@ -1,39 +1,42 @@
 import React, { useState } from "react";
 
 const AudioRecorder = () => {
-  const [recording, setRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioChunks, setAudioChunks] = useState([]);
   const [audioURL, setAudioURL] = useState(null);
   const [serverResponse, setServerResponse] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
 
   const startRecording = () => {
-    setRecording(true);
-    setAudioChunks([]);
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
-        const mediaRecorder = new MediaRecorder(stream);
-
-        mediaRecorder.ondataavailable = (event) => {
+        const recorder = new MediaRecorder(stream);
+        recorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
             setAudioChunks((chunks) => [...chunks, event.data]);
           }
         };
-
-        mediaRecorder.onstop = () => {
+        recorder.onstop = () => {
           const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
           const audioURL = URL.createObjectURL(audioBlob);
           setAudioURL(audioURL);
-
           sendAudioToServer(audioBlob);
         };
-
-        mediaRecorder.start();
-        setTimeout(() => mediaRecorder.stop(), 5000); // Record for 5 seconds
+        setMediaRecorder(recorder);
+        recorder.start();
+        setIsRecording(true);
       })
       .catch((error) => {
         console.error("Error accessing microphone:", error);
       });
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
   };
 
   const sendAudioToServer = async (audioBlob) => {
@@ -48,7 +51,7 @@ const AudioRecorder = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        setServerResponse(responseData.message); // Display the server response
+        setServerResponse(responseData.message);
       } else {
         console.error("Error sending audio to server:", response.statusText);
       }
@@ -59,8 +62,11 @@ const AudioRecorder = () => {
 
   return (
     <div>
-      <button onClick={startRecording} disabled={recording}>
+      <button onClick={startRecording} disabled={isRecording}>
         Start Recording
+      </button>
+      <button onClick={stopRecording} disabled={!isRecording}>
+        Stop Recording
       </button>
       {audioURL && (
         <audio controls src={audioURL} style={{ marginTop: "1rem" }} />
