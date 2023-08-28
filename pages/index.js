@@ -18,7 +18,7 @@ export default function Home() {
         };
         recorder.onstop = () => {
           const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-          setDuration(audioBlob.duration);
+          setDuration(audioBlob.duration); // This line will not work. AudioBlob doesn't have a duration property.
           sendAudioToServer(audioBlob);
         };
         setMediaRecorder(recorder);
@@ -37,24 +37,19 @@ export default function Home() {
 
   const sendAudioToServer = async audioBlob => {
     const formData = new FormData();
-    const reader = new FileReader();
+    formData.append('audio', audioBlob);
 
-    reader.onload = () => {
-      const audioData = reader.result.split(',')[1]; // Get the base64-encoded audio data
-      formData.append('audio', audioData);
-
-      fetch('/api/process_audio', {
+    try {
+      const response = await fetch('/api/process_audio', {
         method: 'POST',
         body: formData,
-      })
-        .then(response => response.json())
-        .then(data => {
-          setDuration(data.duration);
-        })
-        .catch(error => console.error('Error sending audio to server:', error));
-    };
+      });
 
-    reader.readAsDataURL(audioBlob);
+      const data = await response.json();
+      setDuration(data.duration);
+    } catch (error) {
+      console.error('Error sending audio to server:', error);
+    }
   };
 
   return (
