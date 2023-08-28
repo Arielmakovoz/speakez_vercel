@@ -14,14 +14,9 @@ def process_audio():
     if audio_file.filename == '':
         return jsonify({'error': 'No selected audio file'}), 400
 
-    audio_duration = get_audio_duration(audio_file)
-    
-    return jsonify({'duration': audio_duration})
+    # Do something with the audio file, such as saving it to disk
 
-def get_audio_duration(audio_file):
-    with wave.open(audio_file, 'rb') as audio:
-        duration = float(audio.getnframes()) / audio.getframerate()
-    return duration
+    return jsonify({'message': 'Audio received successfully'})
 #make a temporary file
 
 #when I took out the backend.py from api and stutter model if worked
