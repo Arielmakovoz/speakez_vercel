@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ReactAudioPlayer from "react-audio-player";
+
 
 const AudioRecorder = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -69,11 +69,12 @@ const AudioRecorder = () => {
       <button onClick={stopRecording} disabled={!isRecording}>
         Stop Recording
       </button>
-      {audioURL && <ReactAudioPlayer src={audioURL} controls />} {/* Use ReactAudioPlayer */}
+      {audioURL && (
+        <audio controls src={audioURL} style={{ marginTop: "1rem" }} />
+      )}
       {serverResponse && <p>Server Response: {serverResponse}</p>}
     </div>
   );
 };
-
 
 export default AudioRecorder;
