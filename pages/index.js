@@ -1,54 +1,59 @@
-import { useState } from 'react';
+import React, { useState } from "react";
 
-export default function Home() {
+const AudioRecorder = () => {
   const [recording, setRecording] = useState(false);
-  const [duration, setDuration] = useState(null);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioChunks, setAudioChunks] = useState([]);
+  const [audioURL, setAudioURL] = useState(null);
+  const [serverResponse, setServerResponse] = useState("");
 
   const startRecording = () => {
+    setRecording(true);
     setAudioChunks([]);
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => {
-        const recorder = new MediaRecorder(stream);
-        recorder.ondataavailable = e => {
-          if (e.data.size > 0) {
-            setAudioChunks(prevChunks => [...prevChunks, e.data]);
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        const mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            setAudioChunks((chunks) => [...chunks, event.data]);
           }
         };
-        recorder.onstop = () => {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-          setDuration(audioBlob.duration); // This line will not work. AudioBlob doesn't have a duration property.
+
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+          const audioURL = URL.createObjectURL(audioBlob);
+          setAudioURL(audioURL);
+
           sendAudioToServer(audioBlob);
         };
-        setMediaRecorder(recorder);
-        recorder.start();
-        setRecording(true);
+
+        mediaRecorder.start();
+        setTimeout(() => mediaRecorder.stop(), 5000); // Record for 5 seconds
       })
-      .catch(error => console.error('Error accessing microphone:', error));
+      .catch((error) => {
+        console.error("Error accessing microphone:", error);
+      });
   };
 
-  const stopRecording = () => {
-    if (mediaRecorder && recording) {
-      mediaRecorder.stop();
-      setRecording(false);
-    }
-  };
-
-  const sendAudioToServer = async audioBlob => {
+  const sendAudioToServer = async (audioBlob) => {
     const formData = new FormData();
-    formData.append('audio', audioBlob);
+    formData.append("audio", audioBlob);
 
     try {
-      const response = await fetch('/api/process_audio', {
-        method: 'POST',
+      const response = await fetch("/api/process_audio", {
+        method: "POST",
         body: formData,
       });
 
-      const data = await response.json();
-      setDuration(data.duration);
+      if (response.ok) {
+        const responseData = await response.json();
+        setServerResponse(responseData.message); // Display the server response
+      } else {
+        console.error("Error sending audio to server:", response.statusText);
+      }
     } catch (error) {
-      console.error('Error sending audio to server:', error);
+      console.error("Error sending audio to server:", error);
     }
   };
 
@@ -57,10 +62,12 @@ export default function Home() {
       <button onClick={startRecording} disabled={recording}>
         Start Recording
       </button>
-      <button onClick={stopRecording} disabled={!recording}>
-        Stop Recording
-      </button>
-      {duration && <p>Audio Duration: {duration.toFixed(2)} seconds</p>}
+      {audioURL && (
+        <audio controls src={audioURL} style={{ marginTop: "1rem" }} />
+      )}
+      {serverResponse && <p>Server Response: {serverResponse}</p>}
     </div>
   );
-}
+};
+
+export default AudioRecorder;
