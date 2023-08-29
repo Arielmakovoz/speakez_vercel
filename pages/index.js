@@ -3,7 +3,7 @@ import React, { useState } from "react";
 const AudioRecorder = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioChunks, setAudioChunks] = useState([]);
-  const [audioBlob, setAudioBlob] = useState(null); // Store the audio blob directly
+  const [audioBlob, setAudioBlob] = useState(null);
   const [serverResponse, setServerResponse] = useState("");
   const [isRecording, setIsRecording] = useState(false);
 
@@ -18,10 +18,9 @@ const AudioRecorder = () => {
           }
         };
         recorder.onstop = () => {
-          const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-          const audioURL = URL.createObjectURL(audioBlob);
-          setAudioURL(audioURL);
-          sendAudioToServer(audioBlob);
+          const blob = new Blob(audioChunks, { type: "audio/wav" });
+          setAudioBlob(blob);
+          sendAudioToServer(blob);
         };
         setMediaRecorder(recorder);
         recorder.start();
@@ -68,9 +67,7 @@ const AudioRecorder = () => {
       <button onClick={stopRecording} disabled={!isRecording}>
         Stop Recording
       </button>
-      {audioBlob && (
-        <audio controls src={URL.createObjectURL(audioBlob)} />
-      )}
+      {audioBlob && <audio controls src={URL.createObjectURL(audioBlob)} />}
       {serverResponse && <p>Server Response: {serverResponse}</p>}
     </div>
   );
