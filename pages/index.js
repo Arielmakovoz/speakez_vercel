@@ -59,13 +59,6 @@ const AudioRecorder = () => {
     }
   };
 
-  const playAudio = () => {
-    if (audioBlob) {
-      const audioElement = new Audio(URL.createObjectURL(audioBlob));
-      audioElement.play();
-    }
-  };
-
   return (
     <div>
       <button onClick={startRecording} disabled={isRecording}>
@@ -74,9 +67,7 @@ const AudioRecorder = () => {
       <button onClick={stopRecording} disabled={!isRecording}>
         Stop Recording
       </button>
-      <button onClick={playAudio} disabled={!audioBlob}>
-        Play Recorded Audio
-      </button>
+      {audioBlob && <audio controls src={URL.createObjectURL(audioBlob)} />}
       {serverResponse && <p>Server Response: {serverResponse}</p>}
     </div>
   );
