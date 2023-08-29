@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 
-
 const AudioRecorder = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioChunks, setAudioChunks] = useState([]);
-  const [audioURL, setAudioURL] = useState(null);
+  const [audioBlob, setAudioBlob] = useState(null); // Store the audio blob directly
   const [serverResponse, setServerResponse] = useState("");
   const [isRecording, setIsRecording] = useState(false);
 
@@ -69,8 +68,8 @@ const AudioRecorder = () => {
       <button onClick={stopRecording} disabled={!isRecording}>
         Stop Recording
       </button>
-      {audioURL && (
-        <audio controls src={audioURL} style={{ marginTop: "1rem" }} />
+      {audioBlob && (
+        <audio controls src={URL.createObjectURL(audioBlob)} />
       )}
       {serverResponse && <p>Server Response: {serverResponse}</p>}
     </div>
