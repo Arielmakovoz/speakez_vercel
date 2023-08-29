@@ -4,6 +4,7 @@ const AudioRecorder = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioChunks, setAudioChunks] = useState([]);
   const [audioBlob, setAudioBlob] = useState(null);
+  const [audioUrl, setAudioUrl] = useState(""); // New state for audio URL
   const [serverResponse, setServerResponse] = useState("");
   const [isRecording, setIsRecording] = useState(false);
 
@@ -15,11 +16,13 @@ const AudioRecorder = () => {
         recorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
             setAudioChunks((chunks) => [...chunks, event.data]);
+            setAudioUrl(URL.createObjectURL(new Blob([...audioChunks, event.data], { type: "audio/wav" }))); // Update audio URL
           }
         };
         recorder.onstop = () => {
           const blob = new Blob(audioChunks, { type: "audio/wav" });
           setAudioBlob(blob);
+          setAudioUrl(URL.createObjectURL(blob)); // Update audio URL
           sendAudioToServer(blob);
         };
         setMediaRecorder(recorder);
@@ -67,7 +70,7 @@ const AudioRecorder = () => {
       <button onClick={stopRecording} disabled={!isRecording}>
         Stop Recording
       </button>
-      {audioBlob && <audio controls src={URL.createObjectURL(audioBlob)} />}
+      {audioUrl && <audio controls src={audioUrl} />} {/* Display recorded audio */}
       {serverResponse && <p>Server Response: {serverResponse}</p>}
     </div>
   );
